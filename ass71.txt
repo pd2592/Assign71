@@ -1,0 +1,49 @@
+emp = load 'employee_details.txt' using PigStorage(',') as (emp_id:int, emp_name:chararray, salary:int, rating:int);
+
+grouped_emp = GROUP emp by rating;
+
+order_grouped_emp = foreach grouped_emp{
+					sort = ORDER emp by emp_name;
+					generate FLATTEN(sort.emp_id), FLATTEN(emp_name);
+};
+
+top5 = limit order_grouped_emp 5;
+
+
+
+
+
+order_emp_salary = ORDER emp by salary desc;
+
+odd_order_emp_salary = FILTER emp by emp_id%2!=0;
+
+top_high_salary = limit odd_order_emp_salary 5; 
+
+
+
+
+
+emp_exp = load 'employee_expenses.txt' using PigStorage('\t') as (emp_id:int, expenses:int);
+
+high_emp_exp = order emp_exp by expenses desc;
+
+highest_exp = limit high_emp_exp 1;
+
+high = FILTER emp by emp_id==(highest_exp.emp_id);
+
+
+
+
+
+
+emp_det_exp = join emp by emp_id, emp_exp by emp_id;
+
+filtered = foreach emp_det_exp generate $0, $1;
+
+
+
+
+
+
+
+
